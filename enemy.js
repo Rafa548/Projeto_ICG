@@ -1,4 +1,5 @@
 import * as THREE from 'https://threejs.org/build/three.module.js';
+import * as IDK from './towermanager.js';
 
 class Enemy {
     constructor(mesh, position, path, target, health, speed) {
@@ -9,6 +10,8 @@ class Enemy {
         this.target = target;
         this.health = health;
         this.speed = speed;
+        this.line = null
+        this.targetedBy = new Set();
     }
 }
 
@@ -39,7 +42,10 @@ export function spawnEnemies(mapData,path,scene) {
     return;
 }
 
-export function updateEnemies(mapData,scene) {
+export function updateEnemies(mapData,scene,towerManager) {
+    let towers = towerManager.towerArray;
+    IDK.clearLinesForOutOfRangeEnemies(towers, enemies, scene);
+    IDK.shootFromTowers(towers, enemies, scene);
     enemies.forEach(enemy => {
         var currentX = enemy.position.x;
         var currentZ = enemy.position.z;
@@ -69,5 +75,12 @@ export function updateEnemies(mapData,scene) {
 
         enemy.position.x = enemy.mesh.position.x;
         enemy.position.z = enemy.mesh.position.z;
+
+        if (enemy.health <= 0) {
+            scene.remove(enemy.mesh);
+            enemies.splice(enemies.indexOf(enemy), 1);
+        }
     });
+    
+    
 }

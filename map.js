@@ -48,8 +48,8 @@ export function loadMap(mapdata, scene, clickableObjs)
           case 1 :
             var tmpbloc = road_cube.clone();
             tmpbloc.scale.y = 0.8;
-            console.log("omg",posx)
-            console.log(posy)
+            //console.log("omg",posx)
+            //console.log(posy)
             tmpbloc.position.set(posx, -0.2 , posy);
             scene.add(tmpbloc);
           break;
