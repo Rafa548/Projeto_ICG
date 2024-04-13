@@ -33,7 +33,7 @@ export function spawnEnemies(mapData,path,scene) {
     //console.log(enemyStartPos)
     const enemyTarget = new THREE.Vector3(path[pathlength-1].x, 1, path[pathlength-1].z);
     const enemyHealth = 100;
-    const enemySpeed = 1;
+    const enemySpeed = 2;
     const enemy = new Enemy(enemyMesh, enemyStartPos, path, enemyTarget, enemyHealth, enemySpeed);
     //console.log(posx,posy)
     scene.add(enemyMesh);
@@ -79,6 +79,7 @@ export function updateEnemies(mapData,scene,towerManager) {
         if (enemy.health <= 0) {
             scene.remove(enemy.mesh);
             enemies.splice(enemies.indexOf(enemy), 1);
+            return;
         }
     });
     
