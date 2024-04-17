@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
 	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
 
@@ -58,11 +60,12 @@
 
 	<script type="importmap">
 		{
-    		"imports": {
-     			 "three": "https://threejs.org/build/three.module.js"
-    		}
-  		}
-	</script>
+		  "imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@<version>/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@<version>/examples/jsm/"
+		  }
+		}
+	  </script>
 
 	<script type="module">
 		import * as THREE from 'three';
@@ -288,5 +291,5 @@
 			<button class="buttonYesNo buttonyes" id="buttonclose">Close</button>
 		</div>
 	</div>
-
 </body>
+</html>
