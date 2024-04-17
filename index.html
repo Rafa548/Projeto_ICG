@@ -1,0 +1,98 @@
+<head>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+
+	<style>
+		body {
+			margin: 0;
+			touch-action: none;
+			background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0, #877fa8), color-stop(100%, #f9ae91));
+			background-image: -webkit-linear-gradient(135deg, #877fa8, #f9ae91);
+			background-image: -moz-linear-gradient(45deg, #877fa8, #f9ae91);
+			background-image: -ms-linear-gradient(45deg, #877fa8 0, #f9ae91 100%);
+			background-image: -o-linear-gradient(45deg, #877fa8, #f9ae91);
+			background-image: linear-gradient(135deg, #877fa8, #f9ae91);
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%;
+			touch-action: none;
+		}
+
+		.buttonYesNo {
+			width: 40%;
+			height: 48px;
+
+			font-size: 1.5em;
+			border-radius: 6px;
+			border: none;
+		}
+
+		.buttonyes {
+			background-color: #16a085;
+			color: white;
+		}
+
+		.buttonno {
+			background-color: #c0392b;
+			color: white;
+		}
+
+
+		.popupdiv {
+			display: none;
+			opacity: 0.7;
+			position: absolute;
+			left: 5%;
+			bottom: 5%;
+			box-sizing: border-box;
+			padding: 25px;
+			width: 90%;
+			color: white;
+			font-family: roboto-font, sans-serif;
+			background-color: black;
+			border-radius: 6px;
+		}
+	</style>
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+
+
+	<script type="importmap">
+		{
+    		"imports": {
+     			 "three": "https://threejs.org/build/three.module.js"
+    		}
+  		}
+	</script>
+  <script type="module" crossorigin src="/assets/index-CmIvElig.js"></script>
+</head>
+
+<body>
+
+	<!-- CREATE MENU -->
+	<div id="createTowerDiv" class="popupdiv">
+		<h2 style="text-align : center;">Create Tower ?</h2>
+		<div style="display:flex;  align-items: center; justify-content: center;">
+			<button class="buttonYesNo buttonyes" id="buttonyes">Yes</button>
+			<div style="width : 5%"></div>
+			<button class="buttonYesNo buttonno" id="buttonno">No</button>
+		</div>
+	</div>
+
+	<!-- TOWER INFO MENU -->
+	<div id="TowerInfoDiv" class="popupdiv">
+		<h2 style="text-align : center;">Selected Tower Info</h2>
+
+		<p>Position : <span id="posXinfo">NULL</span> / <span id="posZinfo">NULL</span></p>
+
+		</br>
+
+		<div style="display:flex;  align-items: center; justify-content: center;">
+			<button class="buttonYesNo buttonno" id="buttondelete">Delete Tower</button>
+			<div style="width : 5%"></div>
+			<button class="buttonYesNo buttonyes" id="buttonclose">Close</button>
+		</div>
+	</div>
+
+</body>
