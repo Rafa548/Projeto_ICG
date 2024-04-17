@@ -56,19 +56,18 @@
 			border-radius: 6px;
 		}
 	</style>
-	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 	<script type="importmap">
-		{
-		  "imports": {
-			"three": "https://cdn.jsdelivr.net/npm/three@<version>/build/three.module.js",
-			"three/addons/": "https://cdn.jsdelivr.net/npm/three@<version>/examples/jsm/"
-		  }
-		}
-	  </script>
+        {
+          "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+          }
+        }
+      </script>
 
 	<script type="module">
-		import * as THREE from 'three';
+		
+		import * as THREE from "https://threejs.org/build/three.module.js";
 		import { MapControls } from 'three/addons/controls/MapControls.js';
 		import { map0_data, loadMap, extractPath } from './src/map.js';
 		import { spawnEnemies, updateEnemies } from './src/enemy.js';
