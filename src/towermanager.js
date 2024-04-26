@@ -6,7 +6,7 @@ class Tower
     {
         this.mesh = undefined;
         this.range = 6;
-        this.damage = 0.05;
+        this.damage = 0.08;
         this.targetEnemy = null;
         this.lines = new Map(); 
     }
@@ -74,7 +74,7 @@ export function clearLinesForOutOfRangeEnemies(towers, enemies, scene) {
 
       // If the enemy is not within range of any tower, remove its line
       if (!isInRange) {
-          console.log("Enemy is out of range of all towers!");
+          //console.log("Enemy is out of range of all towers!");
           removeLineForEnemy(enemy, scene);
       }
   });
@@ -133,7 +133,7 @@ function shootFromTower(tower, enemy, scene) {
   let can_shoot = isEnemyInRange(tower, enemy);
   if (can_shoot && enemy.health > 0) {
       enemy.health -= tower.damage;
-      console.log(`Tower shot enemy! Enemy health: ${enemy.health}`);
+      //console.log(`Tower shot enemy! Enemy health: ${enemy.health}`);
 
       // Create or update the line connecting tower and enemy
       let line = getOrCreateLine(tower, enemy, scene);
@@ -144,13 +144,13 @@ function shootFromTower(tower, enemy, scene) {
 
       if (enemy.health <= 0) {
         
-        console.log("Enemy is dead!");
+        //console.log("Enemy is dead!");
         removeLineForEnemy(enemy, scene)
         // Enemy is dead, remove the line for all towers targeting this enemy
     }
   }
   else {
-      console.log("Enemy is out of range of tower!");
+      //console.log("Enemy is out of range of tower!");
       //tower.targetEnemy = null; // Clear the target for the tower
       if (tower.targetEnemy) {
           tower.targetEnemy.targetedBy.delete(tower); // Remove the tower from the set of towers targeting the enemy

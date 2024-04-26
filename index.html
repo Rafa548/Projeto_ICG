@@ -3,17 +3,20 @@
 <head>
 	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
 
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 	<style>
 		body {
-			margin: 0;
-			touch-action: none;
-			background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0, #877fa8), color-stop(100%, #f9ae91));
-			background-image: -webkit-linear-gradient(135deg, #877fa8, #f9ae91);
-			background-image: -moz-linear-gradient(45deg, #877fa8, #f9ae91);
-			background-image: -ms-linear-gradient(45deg, #877fa8 0, #f9ae91 100%);
-			background-image: -o-linear-gradient(45deg, #877fa8, #f9ae91);
-			background-image: linear-gradient(135deg, #877fa8, #f9ae91);
-		}
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-image: linear-gradient(135deg, #877fa8, #f9ae91);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+        }
 
 		canvas {
 			width: 100%;
@@ -40,6 +43,27 @@
 			color: white;
 		}
 
+		.interface {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .interface p {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .interface p span {
+            margin-left: 5px;
+        }
 
 		.popupdiv {
 			display: none;
@@ -55,6 +79,94 @@
 			background-color: black;
 			border-radius: 6px;
 		}
+
+		.startScreen {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .buttonStart {
+            width: 200px;
+            height: 60px;
+            font-size: 1.5em;
+            border-radius: 6px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .buttonStart:hover {
+            background-color: #2980b9;
+        }
+		
+		/* Set color for heart icon */
+        .fas.fa-heart {
+            color: red;
+        }
+
+        /* Set color for coin icon */
+        .fas.fa-coins {
+            color: yellow;
+        }
+
+
+		/* Style for game over screen */
+		#gameOverScreen {
+			display: none;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			max-width: 400px; /* Set maximum width */
+			max-height: 300px; /* Set maximum height */
+			padding: 20px;
+			background-color: rgba(0, 0, 0, 0.8);
+			border-radius: 10px;
+			text-align: center;
+		}
+
+		#gameOverScreen i {
+			color: #ff4d4d; /* Red color for the skull icon */
+		}
+
+		#gameOverScreen h2 {
+			color: white;
+			font-size: 24px;
+			margin-bottom: 10px;
+		}
+
+		#gameOverScreen p {
+			color: white;
+			font-size: 18px;
+			margin-bottom: 20px;
+		}
+
+		/* Style for Try Again button */
+		#tryAgainButton {
+			background-color: #ff4d4d; /* Red background */
+			color: white;
+			padding: 10px 20px;
+			font-size: 16px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		#tryAgainButton:hover {
+			background-color: #e60000; /* Darker red on hover */
+		}
+
+
+
 	</style>
 	<script type="importmap">
         {
@@ -97,8 +209,11 @@
 		var enemySpawnTimer = 0;
 		const enemySpawnInterval = 5;
 		const path = extractPath(map0_data);
+		var health = 1;
 
 		function init() {
+			updateHealthDisplay();
+
 			clock = new THREE.Clock();
 			scene = new THREE.Scene();
 
@@ -112,10 +227,10 @@
 
 			// camera
 			const aspect = window.innerWidth / window.innerHeight;
-			const frustumSize = 10;
+			const frustumSize = 20;
 
 			camera = new THREE.OrthographicCamera(frustumSize * aspect / -2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / -2, 1, 1000);
-			camera.position.set(-15, 15, -15);
+			camera.position.set(-25, 25, -25);
 			scene.add(camera);
 
 
@@ -202,8 +317,15 @@
 				spawnEnemies(map0_data,path,scene);
 				enemySpawnTimer = 0;
 			}
+			health = updateEnemies(map0_data,scene,towerMngr,health);
+			updateHealthDisplay();
+			if (health <= 0) {
+				// Display game over screen
+				document.getElementById("gameOverScreen").style.display = "block";
 
-			updateEnemies(map0_data,scene,towerMngr);
+				// Stop further initialization
+				return;
+			}
 			controls.update();
 			renderer.render(scene, camera);
 
@@ -237,6 +359,25 @@
 			}
 		}
 
+		// Function to clear the scene
+		function clearScene() {
+			// Remove all objects from the scene
+			scene.traverse(function(object) {
+				if (object instanceof THREE.Mesh) {
+					scene.remove(object);
+					object.geometry.dispose();
+					object.material.dispose();
+				}
+			});
+
+			// Remove the renderer's canvas element
+			const rendererCanvas = renderer.domElement;
+			rendererCanvas.parentNode.removeChild(rendererCanvas);
+		}
+
+
+
+
 		function onMouseDown(event) {
 			event.preventDefault()
 			mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -259,12 +400,49 @@
 			}
 		}
 
-		init();
+		function updateHealthDisplay() {
+            document.getElementById("healthDisplay").textContent = health;
+        }
+
+		document.getElementById("startButton").addEventListener("click", function() {
+            // Hide start screen
+            document.querySelector(".startScreen").style.display = "none";
+
+			// Show game interface
+			document.querySelector(".interface").style.display = "flex";
+            
+            init();
+        });
+
+		document.getElementById("tryAgainButton").addEventListener("click", function() {
+			location.reload(); // Reload the page
+		});
 
 	</script>
 </head>
 
 <body>
+
+	<div id="gameOverScreen" class="popupdiv">
+		<i class="fas fa-skull fa-4x"></i> <!-- Skull icon -->
+		<h2>Game Over</h2>
+		<p>Your health reached 0</p>
+		<button id="tryAgainButton">Try Again</button>
+	</div>
+	
+	
+
+	<!-- START SCREEN -->
+	<div class="startScreen">
+        <h1>STDG</h1>
+        <button class="buttonStart" id="startButton">Start Game</button>
+    </div>
+
+	<!-- GAME INTERFACE -->
+	<div class="interface">
+		<p><i class="fas fa-heart"></i>  <span id="healthDisplay">100</span></p>
+        <p><i class="fas fa-coins"></i>  <span id="moneyDisplay">100</span></p>
+    </div>
 
 	<!-- CREATE MENU -->
 	<div id="createTowerDiv" class="popupdiv">

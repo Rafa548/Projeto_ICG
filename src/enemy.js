@@ -1,5 +1,6 @@
 import * as THREE from 'https://threejs.org/build/three.module.js';
 import * as IDK from './towermanager.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class Enemy {
     constructor(mesh, position, path, target, health, speed) {
@@ -19,30 +20,37 @@ const enemies = [];
 
  // Function to spawn enemies at the start of the path (talvez implementar varios spawns em locais diferentes do mapa (cantos) a ideia seria escolher as pontas 1 meta restantes spawn de enemies logo é preciso de varios paths)
 export function spawnEnemies(mapData,path,scene) {
-    const size_X = mapData.data.length;
-    const size_Y = mapData.data[0].length;
+    const loader = new GLTFLoader();
+    loader.load("drone.glb", function(glb) {
+        console.log(glb)
+        const enemyMesh = glb.scene;
 
-    const enemyMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.3, 32, 16),
-        new THREE.MeshBasicMaterial({ color: 0xff0000 }) // Red material for enemy
-    );
+        enemyMesh.rotation.y = Math.PI;
 
-    var pathlength = path.length;
+        const scale = 0.4;
+        enemyMesh.scale.set(scale, scale, scale);
 
-    const enemyStartPos = new THREE.Vector3(path[0].x,1,path[0].z); 
-    //console.log(enemyStartPos)
-    const enemyTarget = new THREE.Vector3(path[pathlength-1].x, 1, path[pathlength-1].z);
-    const enemyHealth = 100;
-    const enemySpeed = 2;
-    const enemy = new Enemy(enemyMesh, enemyStartPos, path, enemyTarget, enemyHealth, enemySpeed);
-    //console.log(posx,posy)
-    scene.add(enemyMesh);
-    enemy.mesh.position.set(enemyStartPos.x, enemyStartPos.y, enemyStartPos.z);
-    enemies.push(enemy);
-    return;
+        var pathlength = path.length;
+        const enemyStartPos = new THREE.Vector3(path[0].x,1,path[0].z); 
+        //console.log(enemyStartPos)
+        const enemyTarget = new THREE.Vector3(path[pathlength-1].x, 1, path[pathlength-1].z);
+        const enemyHealth = 100;
+        const enemySpeed = 2;
+        const enemy = new Enemy(enemyMesh, enemyStartPos, path, enemyTarget, enemyHealth, enemySpeed);
+        //console.log(posx,posy)
+        scene.add(enemyMesh);
+        enemy.mesh.position.set(enemyStartPos.x, enemyStartPos.y, enemyStartPos.z);
+        enemies.push(enemy);
+    },
+    function(xhr) {
+        console.log((xhr.loaded / xhr.total * 100) + "% loaded");
+    },   
+    function(error) {
+        console.log("An error happened");
+    });
 }
 
-export function updateEnemies(mapData,scene,towerManager) {
+export function updateEnemies(mapData,scene,towerManager,health) {
     let towers = towerManager.towerArray;
     IDK.clearLinesForOutOfRangeEnemies(towers, enemies, scene);
     IDK.shootFromTowers(towers, enemies, scene);
@@ -63,13 +71,17 @@ export function updateEnemies(mapData,scene,towerManager) {
         enemy.mesh.position.x += direction.x * speed;
         enemy.mesh.position.z += direction.y * speed;
 
+        const angle = Math.atan2(deltaX,deltaZ ) + Math.PI;        
+        enemy.mesh.rotation.y = angle;
+
         if (Math.abs(enemy.mesh.position.x - target.x) <= speed && Math.abs(enemy.mesh.position.z - target.z) <= speed) {
             enemy.currentPosition++;
 
             if (enemy.currentPosition >= path.length) {
                 scene.remove(enemy.mesh);
                 enemies.splice(enemies.indexOf(enemy), 1);
-                return;
+                health -= 151 ;
+                return health;
             }
         }
 
@@ -79,9 +91,9 @@ export function updateEnemies(mapData,scene,towerManager) {
         if (enemy.health <= 0) {
             scene.remove(enemy.mesh);
             enemies.splice(enemies.indexOf(enemy), 1);
-            return;
+            return health;
         }
     });
-    
+    return health;
     
 }
