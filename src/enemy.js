@@ -22,7 +22,7 @@ const enemies = [];
 export function spawnEnemies(mapData,path,scene) {
     const loader = new GLTFLoader();
     loader.load("drone.glb", function(glb) {
-        console.log(glb)
+        //console.log(glb)
         const enemyMesh = glb.scene;
 
         enemyMesh.rotation.y = Math.PI;

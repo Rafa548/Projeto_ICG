@@ -1,17 +1,18 @@
 import * as THREE from 'https://threejs.org/build/three.module.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export var map0_data = {
   "data" : [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+    [4, 1, 4, 4, 2, 4, 4, 4, 4, 0],
+    [2, 1, 1, 1, 1, 1, 1, 1, 4, 0],
+    [4, 4, 4, 4, 4, 4, 2, 1, 4, 0],
+    [0, 0, 0, 0, 4, 1, 1, 1, 2, 0],
+    [0, 0, 0, 0, 2, 1, 4, 4, 4, 0],
+    [0, 0, 0, 0, 4, 1, 4, 0, 0, 0],
+    [0, 0, 0, 0, 4, 1, 4, 0, 0, 0],
+    [0, 0, 0, 0, 4, 1, 4, 4, 2, 4],
+    [0, 0, 0, 0, 2, 1, 1, 1, 1, 4],
+    [0, 0, 0, 0, 4, 4, 2, 4, 1, 4]
   ]
 }
 
@@ -27,6 +28,9 @@ export function loadMap(mapdata, scene, clickableObjs)
   const road_material = new THREE.MeshLambertMaterial({color : 0x2c3e50});
   var road_cube = new THREE.Mesh(geometry, road_material);
 
+  const tree_material = new THREE.MeshLambertMaterial({ color: 0x228B22 }); // Green color for trees
+  const tree_geometry = new THREE.ConeGeometry(1, 4, 8); // Cone-shaped tree
+
   for(var x  = 0 ; x < size_X ; x++)
   {
     for(var y = 0 ; y < size_Y ;  y++)
@@ -36,23 +40,41 @@ export function loadMap(mapdata, scene, clickableObjs)
 
         switch(mapdata.data[y][x])
         {
+          
+
           case 0:
+              const block = basic_cube.clone();
+              block.position.set(posx, 0, posy);
+              scene.add(block);
+              break
+
+          case 1 :
+              var tmpbloc = road_cube.clone();
+              tmpbloc.scale.y = 0.8;
+              //console.log("omg",posx)
+              //console.log(posy)
+              tmpbloc.position.set(posx, -0.2 , posy);
+              scene.add(tmpbloc);
+              break;
+
+          case 2:
+              const tree = new THREE.Mesh(tree_geometry, tree_material);
+              tree.position.set(posx, 2, posy);
+              scene.add(tree);
+
+              const block0 = basic_cube.clone();
+              block0.position.set(posx, 0, posy); 
+              scene.add(block0);
+              break;
+
+          case 4:
               var tmpbloc = basic_cube.clone();
               //console.log("swnasuhuahs",posx)
               //console.log(posy)
               tmpbloc.position.set(posx, 0 , posy);
               scene.add(tmpbloc);
               clickableObjs.push(tmpbloc);
-          break;
-
-          case 1 :
-            var tmpbloc = road_cube.clone();
-            tmpbloc.scale.y = 0.8;
-            //console.log("omg",posx)
-            //console.log(posy)
-            tmpbloc.position.set(posx, -0.2 , posy);
-            scene.add(tmpbloc);
-          break;
+              break;
         }
     }
   }
@@ -60,13 +82,12 @@ export function loadMap(mapdata, scene, clickableObjs)
 
 export function extractPath(mapdata) {
   const path = [];
-  const visited = new Set(); // Track visited positions
+  const visited = new Set(); 
 
   let y = 0;
   let x = 0;
 
   while (true) {
-    // Find closest unvisited "1"
     let closestX = -1;
     let closestY = -1;
     let minDistance = Infinity;
@@ -76,10 +97,9 @@ export function extractPath(mapdata) {
         const newY = y + dy;
         const newX = x + dx;
 
-        // Check valid coordinates and avoid going back
         if (newY >= 0 && newY < mapdata.data.length && newX >= 0 && newX < mapdata.data[0].length && !visited.has(`${newY},${newX}`)) {
           if (mapdata.data[newY][newX] === 1) {
-            const distance = Math.abs(dx) + Math.abs(dy); // Manhattan distance
+            const distance = Math.abs(dx) + Math.abs(dy); 
             if (distance < minDistance) {
               minDistance = distance;
               closestY = newY;
@@ -90,12 +110,10 @@ export function extractPath(mapdata) {
       }
     }
 
-    // No more "1" found, break the loop
     if (closestX === -1 && closestY === -1) {
       break;
     }
 
-    // Update path and visited positions
     const posx = (closestX * 2) - (mapdata.data[0].length / 2) * 2;
     const posy = (closestY * 2) - (mapdata.data.length / 2) * 2;
 
