@@ -34,8 +34,8 @@ export function spawnEnemies(mapData,path,scene) {
         const enemyStartPos = new THREE.Vector3(path[0].x,1,path[0].z); 
         //console.log(enemyStartPos)
         const enemyTarget = new THREE.Vector3(path[pathlength-1].x, 1, path[pathlength-1].z);
-        const enemyHealth = 100;
-        const enemySpeed = 2;
+        const enemyHealth = 300;
+        const enemySpeed = 0.01;
         const enemy = new Enemy(enemyMesh, enemyStartPos, path, enemyTarget, enemyHealth, enemySpeed);
         //console.log(posx,posy)
         scene.add(enemyMesh);
@@ -66,7 +66,12 @@ export function updateEnemies(mapData,scene,towerManager,health) {
 
         const direction = new THREE.Vector2(deltaX, deltaZ).normalize();
 
-        const speed = 0.01; // Adjust this value to control the speed (lower value = slower speed)
+        if (enemy.speed < 0.01) {
+            enemy.speed += 0.0001;
+        }
+
+        const speed = enemy.speed;
+
 
         enemy.mesh.position.x += direction.x * speed;
         enemy.mesh.position.z += direction.y * speed;

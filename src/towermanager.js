@@ -2,13 +2,22 @@ import * as THREE from 'https://threejs.org/build/three.module.js';
 
 class Tower
 {
-    constructor()
+    constructor(type)
     {
         this.mesh = undefined;
         this.range = 6;
-        this.damage = 0.08;
+       
         this.targetEnemy = null;
-        this.lines = new Map(); 
+        this.lines = new Map();
+        this.type = type;
+
+        const damageLookup = {
+            'red': 0.04,
+            'blue': 0.02,
+            'yellow': 0.02,
+        };
+
+        this.damage = damageLookup[type] || 0.04;
     }
 }
 
@@ -24,9 +33,9 @@ export class TowerManager
         this.selectedTower = undefined;
     }
 
-    addTower(newtowermesh)
+    addTower(newtowermesh,type)
     {
-      var newtower = new Tower();
+      var newtower = new Tower(type);
       newtower.mesh = newtowermesh;
       this.towerArray.push(newtower);
     }
@@ -132,6 +141,9 @@ function shootFromTower(tower, enemy, scene) {
 
   let can_shoot = isEnemyInRange(tower, enemy);
   if (can_shoot && enemy.health > 0) {
+      if (tower.type == "slow") {
+        enemy.speed = 0.007;
+      }
       enemy.health -= tower.damage;
       //console.log(`Tower shot enemy! Enemy health: ${enemy.health}`);
 
@@ -188,7 +200,15 @@ function getOrCreateLine(tower, enemy, scene) {
           tower.mesh.position,
           enemy.mesh.position
       ]);
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000 }); // Red color
+      if (tower.type == "slow") {
+        var material = new THREE.LineBasicMaterial({ color: 0x0000ff }); // Blue color
+      }
+      else if (tower.type == "aoe") {
+        var material = new THREE.LineBasicMaterial({ color: 0xffff00 }); // Yellow color
+      }
+      else {
+        var material = new THREE.LineBasicMaterial({ color: 0xff0000 }); // Red color
+      }
       line = new THREE.Line(geometry, material);
       scene.add(line);
       tower.lines.set(enemy, line);
