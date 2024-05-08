@@ -19,7 +19,7 @@ class Enemy {
 const enemies = [];
 
  // Function to spawn enemies at the start of the path (talvez implementar varios spawns em locais diferentes do mapa (cantos) a ideia seria escolher as pontas 1 meta restantes spawn de enemies logo é preciso de varios paths)
-export function spawnEnemies(mapData,path,scene) {
+export function spawnEnemies(mapData,path,scene,hpMultiplier) {
     const loader = new GLTFLoader();
     loader.load("drone.glb", function(glb) {
         //console.log(glb)
@@ -34,7 +34,7 @@ export function spawnEnemies(mapData,path,scene) {
         const enemyStartPos = new THREE.Vector3(path[0].x,1,path[0].z); 
         //console.log(enemyStartPos)
         const enemyTarget = new THREE.Vector3(path[pathlength-1].x, 1, path[pathlength-1].z);
-        const enemyHealth = 300;
+        const enemyHealth = 30*hpMultiplier;
         const enemySpeed = 0.01;
         const enemy = new Enemy(enemyMesh, enemyStartPos, path, enemyTarget, enemyHealth, enemySpeed);
         //console.log(posx,posy)
@@ -50,7 +50,7 @@ export function spawnEnemies(mapData,path,scene) {
     });
 }
 
-export function updateEnemies(mapData,scene,towerManager,health) {
+export function updateEnemies(mapData,scene,towerManager,health,money,score) {
     let towers = towerManager.towerArray;
     IDK.clearLinesForOutOfRangeEnemies(towers, enemies, scene);
     IDK.shootFromTowers(towers, enemies, scene);
@@ -85,8 +85,10 @@ export function updateEnemies(mapData,scene,towerManager,health) {
             if (enemy.currentPosition >= path.length) {
                 scene.remove(enemy.mesh);
                 enemies.splice(enemies.indexOf(enemy), 1);
-                health -= 151 ;
-                return health;
+                health -= 10 ;
+                money += 0;
+                score += 0; 
+                return { health, money, score }; 
             }
         }
 
@@ -96,9 +98,11 @@ export function updateEnemies(mapData,scene,towerManager,health) {
         if (enemy.health <= 0) {
             scene.remove(enemy.mesh);
             enemies.splice(enemies.indexOf(enemy), 1);
-            return health;
+            money += 4;
+            score += 20;
+            return { health, money, score };
         }
     });
-    return health;
+    return { health, money, score };
     
 }
