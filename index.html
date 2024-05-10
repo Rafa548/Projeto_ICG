@@ -500,8 +500,7 @@
 
 			document.getElementById("buttondelete").addEventListener('click', function () {
 				event.stopPropagation();
-				console.log("delete");
-				console.log(towerMngr.selectedTower);
+				
 				if (towerMngr.selectedTower.type == 'normal')
 				{
 					money += 20*0.8;
@@ -517,6 +516,25 @@
 				towerMngr.deleteTower(towerMngr.selectedTower);
 				scene.remove(towerMngr.selectedTower.mesh);
 
+				infoTowerGui_close();
+				towerMngr.selectedTower = undefined;
+				updateInterface();
+			});
+
+			document.getElementById("buttonUpgrade").addEventListener('click', function () {
+				event.stopPropagation();
+				
+				
+				if (money < 20) {
+					document.getElementById("modal-text").innerHTML = "Not enough money";
+					modal.style.display = "block";
+					return;
+				}
+
+				towerMngr.selectedTower.damage += towerMngr.selectedTower.damage*0.1;
+				money -= 20;
+
+				
 				infoTowerGui_close();
 				towerMngr.selectedTower = undefined;
 				updateInterface();
@@ -762,7 +780,7 @@
 		<div style="display:flex;  align-items: center; justify-content: center;">
 			<button class="buttonYesNo buttonno" id="buttondelete">Delete Tower (-20% of tower value)</button>
 			<div style="width : 5%"></div>
-			<button class="buttonYesNo buttonyes" id="buttonclose">Upgrade Tower 20 <i class="fas fa-coins"></i>  (10% dmg increase) (No refund)</button>
+			<button class="buttonYesNo buttonyes" id="buttonUpgrade">Upgrade Tower 20 <i class="fas fa-coins"></i>  (10% dmg increase) (No refund)</button>
 		</div>
 	</div>
 </body>
