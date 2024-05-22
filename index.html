@@ -358,6 +358,10 @@
 		var money = 100;
 		var score = 0;
 		var enemyHpMultiplier = 1;	
+
+		const audioLoader = new THREE.AudioLoader();
+		const listener = new THREE.AudioListener();
+		const audio = new THREE.Audio(listener);
 		
 
 		function init() {
@@ -383,6 +387,17 @@
 			scene.add(camera);
 
 
+			audioLoader.load('music.mp3', function(buffer) {
+				audio.setBuffer(buffer);
+				audio.setLoop(true);
+				audio.setVolume(0.2); 
+				audio.play();
+			});
+
+			camera.add(listener); 
+
+			
+
 			// controls
 			controls = new MapControls(camera, renderer.domElement);
 			controls.enableDamping = true;
@@ -391,6 +406,11 @@
 			controls.minDistance = 2;
 			controls.maxDistance = 20;
 			controls.maxPolarAngle = Math.PI / 2;
+
+			// Event listener to update audio listener position when camera moves
+			controls.addEventListener('change', function() {
+				updateAudioListener();
+			});
 
 			//cursor
 			const corsor_material = new THREE.MeshLambertMaterial({ transparent: true, opacity: 0, color: 0xc0392b });
@@ -415,7 +435,6 @@
 
 			var modal = document.getElementById("noMoneyModal");
 
-			// Get the <span> element that closes the modal
 			var span = document.getElementsByClassName("close")[0];
 
 			//event
@@ -566,6 +585,11 @@
 			render();
 		}
 
+		function updateAudioListener() {
+			listener.position.copy(camera.position);
+			listener.setRotationFromMatrix(camera.matrixWorld);
+		}
+
 
 		//loop ok
 		function render() {
@@ -601,7 +625,7 @@
 				// Display game over screen
 				document.getElementById("gameOverScreen").style.display = "block";
 
-				// Stop further initialization
+				// Hide game interface
 				return;
 			}
 			controls.update();
@@ -696,7 +720,7 @@
         });
 
 		document.getElementById("tryAgainButton").addEventListener("click", function() {
-			location.reload(); // Reload the page
+			location.reload(); 
 		});
 
 	</script>
@@ -705,7 +729,7 @@
 <body>
 
 	<div id="gameOverScreen" class="popupdiv">
-		<i class="fas fa-skull fa-4x"></i> <!-- Skull icon -->
+		<i class="fas fa-skull fa-4x"></i>
 		<h2>Game Over</h2>
 		<p>Your health reached 0</p>
 		<button id="tryAgainButton">Try Again</button>
